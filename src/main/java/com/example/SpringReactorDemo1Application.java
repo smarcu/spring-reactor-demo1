@@ -15,7 +15,7 @@ public class SpringReactorDemo1Application {
 				.log()
 				.map(String::toUpperCase);
 
-		upper.subscribe();
+		upper.subscribe(System.out::println);
 
 
 	}
