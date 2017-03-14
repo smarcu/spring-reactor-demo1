@@ -9,4 +9,5 @@ example based on https://spring.io/blog/2016/06/13/notes-on-reactive-programming
     * Flux, log, map, subscribe
 * STEP-2
     * Subscriber
-    
+* STEP-3
+    * Subscriber with batch

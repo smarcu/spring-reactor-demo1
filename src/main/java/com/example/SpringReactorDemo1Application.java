@@ -14,17 +14,28 @@ public class SpringReactorDemo1Application {
 		Flux<String> flux = Flux.just("red", "white", "blue");
 
 		Flux<String> upper = flux
+				.log()
 				.map(String::toUpperCase);
 
 		upper.subscribe(new Subscriber<String>() {
+
+			private int count = 0;
+			private Subscription subscription;
+
 			@Override
 			public void onSubscribe(Subscription subscription) {
-				subscription.request(Long.MAX_VALUE);
+				this.subscription = subscription;
+				subscription.request(2);
 			}
 
 			@Override
 			public void onNext(String t) {
-				System.out.println("onNext: " + t);
+				System.out.println("onNext: "+t);
+				count++;
+				if (count>=2) {
+					count = 0;
+					subscription.request(2);
+				}
 			}
 
 			@Override
@@ -37,6 +48,8 @@ public class SpringReactorDemo1Application {
 				System.out.println("onComplete");
 			}
 		});
+
+		//upper.subscribe(2);
 
 	}
 }
