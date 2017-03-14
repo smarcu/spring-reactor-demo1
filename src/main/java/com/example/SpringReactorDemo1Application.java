@@ -1,55 +1,23 @@
 package com.example;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 public class SpringReactorDemo1Application {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 
-		Flux<String> flux = Flux.just("red", "white", "blue");
+		Flux.just("red", "white", "blue")
+			.log()
+			.map(String::toUpperCase)
 
-		Flux<String> upper = flux
-				.log()
-				.map(String::toUpperCase);
+			// subscriptions to be handled on background thread
+			.subscribeOn(Schedulers.parallel())
 
-		upper.subscribe(new Subscriber<String>() {
+			.subscribe(s -> {System.out.println(s);}, 2);
 
-			private int count = 0;
-			private Subscription subscription;
-
-			@Override
-			public void onSubscribe(Subscription subscription) {
-				this.subscription = subscription;
-				subscription.request(2);
-			}
-
-			@Override
-			public void onNext(String t) {
-				System.out.println("onNext: "+t);
-				count++;
-				if (count>=2) {
-					count = 0;
-					subscription.request(2);
-				}
-			}
-
-			@Override
-			public void onError(Throwable throwable) {
-				throwable.printStackTrace();
-			}
-
-			@Override
-			public void onComplete() {
-				System.out.println("onComplete");
-			}
-		});
-
-		//upper.subscribe(2);
-
+		// give schedulers a chance to finish
+		Thread.sleep(2000);
 	}
 }
