@@ -14,25 +14,22 @@ public class SpringReactorDemo1Application {
 
 
 		Flux.just("a", "b", "c", "d", "e", "f", "g", "h", "i")
-
 			.log()
+			.map(String::toUpperCase)
+			.subscribeOn(Schedulers.newParallel("sub"))
 
-				// To switch the processing of the individual items to separate threads
-				// (up to the limit of the pool) we need to break them out into separate publishers,
-				// and for each of those publishers ask for the result in a background thread.
+			// Flux also has a publishOn() method which is the same, but for the listeners
+			// (i.e. onNext() or consumer callbacks) instead of for the subscriber itself
 
-				.flatMap(value ->
-						Mono.just(value.toUpperCase()).subscribeOn(Schedulers.parallel()),
-						2)
+			.publishOn(Schedulers.newParallel("pub"), 3)
 
-				// Notice that there are now multiple threads consuming the items, and the concurrency
-				// hint in the flatMap() ensures that there are 2 items being processed at any given time,
-				// as long as they are available. We see request(1) a lot because the system is trying to keep 2
-				// items in the pipeline, and generally they don’t finish processing at the same time.
-				// Reactor tries to be very smart here in fact, and it pre-fetches items from the
-				// upstream Publisher to try to eliminate waiting time for the subscriber
+			//Notice that the consumer callbacks (logging "Consumed: …​") are on the publisher thread pub-1-1.
+			// If you take out the subscribeOn() call, you might see all of the 2nd chunk of data processed
+			// on the pub-1-1 thread as well. This, again, is Reactor being frugal with threads 
+			// — if there’s no explicit request to switch threads it stays on the same one for the next call,
+			// whatever that is.
 
-				.subscribe(value -> {LOG.info("Consumed: {}", value);});
+			.subscribe(value -> {LOG.info("Consumed: {}", value);});
 
 
 		// give schedulers a chance to finish

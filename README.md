@@ -15,3 +15,5 @@ example based on https://spring.io/blog/2016/06/13/notes-on-reactive-programming
     * Threads (single background)
 * STEP-5
     * Threads (multiple background)
+* STEP-6
+    * Threads (publisher)
