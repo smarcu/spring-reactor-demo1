@@ -1,6 +1,8 @@
 # spring-reactor-demo1
 Spring Reactor Demo 1
 
+Example project used in presentation https://github.com/smarcu/ReactivePresentation/blob/master/Reactive.pdf
+
 example based on https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code
 
 
